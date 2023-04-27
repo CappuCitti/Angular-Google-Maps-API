@@ -1,5 +1,21 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
+import { ApiService } from 'src/services/api.service';
+
+const iconRetinaUrl = 'assets/marker-icon-2x.png';
+const iconUrl = 'assets/marker-icon.png';
+const shadowUrl = 'assets/marker-shadow.png';
+const iconDefault = L.icon({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41],
+});
+L.Marker.prototype.options.icon = iconDefault;
 
 @Component({
   selector: 'app-map',
@@ -8,6 +24,8 @@ import * as L from 'leaflet';
 })
 export class MapComponent implements AfterViewInit {
   private map: any;
+
+  constructor(private api: ApiService) {}
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -25,36 +43,101 @@ export class MapComponent implements AfterViewInit {
       }
     );
 
-    const marker = new L.Marker([45.464211, 9.191383])
-      .bindPopup('UGO')
-      .setIcon(L.icon({ iconUrl: '/assets/cat.ico', iconSize: [64, 64] }));
-    marker.addTo(this.map);
-
-    const rectangle = new L.Polygon([
-      [45.464211, 9.191383],
-      [45.464211, 9.120383],
-      [45.474211, 9.120383],
-      [45.474211, 9.191383],
-    ]).setStyle({ fillColor: '#ddb52c', color: 'purple' });
-    rectangle.addTo(this.map);
-
-    const circle = L.circle([45.464211, 9.191383], 100, { color: 'green' });
-    circle.addTo(this.map);
-
-    const center = { lat: 45.464211, lng: 9.191383 };
-    const triangle = L.polygon([
-      [center.lat + 0.001, center.lng - 0.002],
-      [center.lat, center.lng],
-      [center.lat - 0.001, center.lng - 0.002],
-    ]);
-    triangle.addTo(this.map);
+    this.api.getVettore(50).subscribe((data) => {
+      data.forEach((e) => {
+        const marker = new L.Marker([e.WGS84_X, e.WGS84_Y])
+          .bindPopup(e.INDIRIZZO)
+          .setIcon(this.findImage(e.CI_VETTORE));
+        marker.addTo(this.map);
+      });
+    });
 
     tiles.addTo(this.map);
   }
 
-  constructor() {}
-
   ngAfterViewInit(): void {
     this.initMap();
+  }
+
+  findImage(label: string): L.Icon {
+    if (label.includes('Gas')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/fire.png',
+        iconUrl: 'assets/fire.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('elettrica')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/electricity.png',
+        iconUrl: 'assets/electricity.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('Gasolio')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/oil.png',
+        iconUrl: 'assets/oil.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('Teleriscaldamento')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/tvb.png',
+        iconUrl: 'assets/tvb.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('GPL')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/gpl.png',
+        iconUrl: 'assets/gpl.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('Biomasse solide')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/solid_biomass.png',
+        iconUrl: 'assets/solid_biomass.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    if (label.includes('Biomasse liquide')) {
+      return L.icon({
+        iconRetinaUrl: 'assets/liquid_biomass.png',
+        iconUrl: 'assets/liquid_biomass.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        tooltipAnchor: [16, -28],
+        shadowSize: [41, 41],
+      });
+    }
+    //Se non viene riconosciuta nessuna etichetta ritorna l'icona undefined
+    return iconDefault;
   }
 }
