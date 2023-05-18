@@ -15,3 +15,11 @@
 #map {
   height: 100%;
 }
+
+#input {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  top: 100px;
+  z-index: 999;
+}

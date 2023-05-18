@@ -7,6 +7,7 @@ export class Ci_vettore {
     public EP_H_ND: number,
     public CI_VETTORE: string,
     public FOGLIO: string,
-    public SEZ: number
+    public SEZ: number,
+    public WKT: string,
   ) {}
 }
